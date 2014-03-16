@@ -287,7 +287,7 @@ class MenuBar(component.Component):
         log.debug("on_menuitem_edittrackers_activate")
         from edittrackersdialog import EditTrackersDialog
         dialog = EditTrackersDialog(
-            component.get("TorrentView").get_selected_torrent(),
+            component.get("TorrentView").get_selected_torrents(),
             component.get("MainWindow").window)
         dialog.run()
 
