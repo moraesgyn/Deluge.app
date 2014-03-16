@@ -44,8 +44,8 @@ import deluge.component as component
 from deluge.log import LOG as log
 
 class EditTrackersDialog:
-    def __init__(self, torrent_id, parent=None):
-        self.torrent_id = torrent_id
+    def __init__(self, torrent_ids, parent=None):
+        self.torrent_ids = torrent_ids
         self.glade = gtk.glade.XML(
                     pkg_resources.resource_filename("deluge.ui.gtkui",
                                             "glade/edit_trackers.glade"))
@@ -90,12 +90,12 @@ class EditTrackersDialog:
 
     def run(self):
         # Make sure we have a torrent_id.. if not just return
-        if self.torrent_id == None:
+        if not self.torrent_ids:
             return
 
         # Get the trackers for this torrent
         session = component.get("SessionProxy")
-        session.get_torrent_status(self.torrent_id, ["trackers"]).addCallback(self._on_get_torrent_status)
+        session.get_torrent_status(self.torrent_ids[0], ["trackers"]).addCallback(self._on_get_torrent_status)
         client.force_call()
 
     def _on_get_torrent_status(self, status):
@@ -176,7 +176,9 @@ class EditTrackersDialog:
             tracker["tier"] = model.get_value(iter, 0)
             tracker["url"] = model.get_value(iter, 1)
             self.trackers.append(tracker)
-        self.liststore.foreach(each, None)
+        #self.liststore.foreach(each, None)
+        for torrent_id in self.torrent_ids:
+        client.core.set_torrent_trackers(torrent_id, self.trackers) 
         # Set the torrens trackers
         client.core.set_torrent_trackers(self.torrent_id, self.trackers)
         self.dialog.destroy()
